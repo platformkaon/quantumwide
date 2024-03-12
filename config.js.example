@@ -1,0 +1,16 @@
+module.exports = {
+	// saving user credentials
+	// in session storage
+	session: true,
+
+	// auto-logout after given
+	// inactivity in milliseconds
+	idleTimer: 5 * 60 * 1000,
+
+	// router address, for development
+	// leave empty for production
+	// protocol 'http' or 'https' is now required. For remote work only http is enabled
+	// chose one of the following, depening on agent's SSL
+	serverAddress: 'https://mygateway.kaonmedia.com'
+	serverAddress: 'http://swuidev.ddns.net:5000'
+}
