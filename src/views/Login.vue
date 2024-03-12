@@ -1,118 +1,99 @@
 <template>
-	<!-- start : content-section -->
-	<section class="content-section">
-		<!-- start : article section -->
-		<article class="article">
-			<div class="wrap-content">
-				<!-- class option : container / container-fluid / container-full -->
-				<div class="container">
-					<section class="module-login">
-						<c-form :name='loginForm.name' :actions='false' @submit.prevent='login()' title='login'>
-							<c-field
-								:label='t("username").cap'
-								:value='loginForm.fields.username'
-								validate='filled'
-								name='username'>
-								<label>ID</label>
-								<input
-									v-model='loginForm.fields.username'
-									class="form-control"
-									:placeholder='t("username").cap'
-									type='text' />
-							</c-field>
-
-							<c-field
-								:label='t("router-password").cap'
-								:value='loginForm.fields.username'
-								validate='filled'
-								:icon='!showPassword ? "type-view" : ""'
-								name='password'>
-								<label @click='togglePassword($event)'>Password</label>
-								<input
-									v-model='loginForm.fields.password'
-									:type='showPassword ? "text" : "password"'
-									class="form-control" 
-									:placeholder='t("router-password").cap' />
-							</c-field>
-
-							<!-- <div class="form-check mt-2">
-								<input type="checkbox" class="form-check-input" id="RememberMe" v-model="remember">
-								<label class="form-check-label" for="RememberMe">Remember Me</label>
-							</div> -->
-
-							<div class="mt-4">
-								<button type="submit" class="btn">{{ t('login') }}</button>
-							</div>
-						</c-form>
-					</section> <!-- /.module-login -->
-					<div class="login-footer">
-						<img src="@/images/dev/login/login-footer.png" alt="">
-						<div class="copyright">copyright 2023 kaonbroadband co., ltd. all right reserved</div>
-					</div>
-				</div> <!-- /.container -->
-			</div> <!-- /.wrap-content -->
-		</article> <!-- /.article -->
-		<!-- end : article section -->
-	</section> <!-- /.content-section -->
+	<section class="section">
+		<form :name='demoform.name' :actions='false' @submit.prevent='demosave'>
+			<div class="table-responsive">
+				<div class="table-title">
+					DEMO
+				</div>
+				<table class="table-setting-wide">
+					<tbody>
+						<tr>
+							<th>
+								<label class="form-label" for="demo">demo checkbox</label>
+							</th>
+							<td>
+								<div class="form-checkbox">
+									<input type="checkbox" class="checkbox" id="demo_checkbox" v-model='demoform.fields.checkbox'>
+									<label class="label" for="demo_checkbox">checkbox label</label>
+								</div>
+							</td>
+						</tr>
+						<tr>
+							<th>
+								<label class="form-label" for="demo">demo selectbox</label>
+							</th>
+							<td>
+								<select class="form-select" name='demoselect' v-model='demoform.fields.selectbox'>
+									<option v-for='item in demoselectlist' :value='item.value' :key='item.value'>
+											{{ item.label }}
+									</option>
+								</select>
+							</td>
+						</tr>
+						<tr>
+							<th>
+								<label class="form-label" for="demo">demo text</label>
+							</th>
+							<td>
+								<!-- class option : none / type-view -->
+								<div class="form-label" :class="'type-view'">
+									<input type="text" class="form-control" id="text" v-model='demoform.fields.text'>
+								</div>
+							</td>
+						</tr>
+						<tr>
+							<th>
+								<label class="form-label" for="demo">demo password</label>
+							</th>
+							<td>
+								<!-- class option : none / type-view -->
+								<div class="form-password-wrap" :class='showPassword ? "" : "type-view"'>
+									<input :type='showPassword.demo ? "text" : "password"' class="form-control" id="password" v-model='demoform.fields.password'>
+									<span class="icon-view-passowrd" @click="togglePassword('demo')"></span>
+								</div>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div> <!-- /.table-responsive -->
+			<div class="btn-area btn-setting-area">
+					<button class="btn btn-secondary" type="submit">demo button</button>
+			</div>
+		</form>
+	</section>
 </template>
 <script>
-import ws from '@/shared/lib/ws'
-import cForm from './login/form.vue'
-import cField from './login/field.vue'
-// import Language from 'components/language.vue'
-import { digestMessage } from '@/shared/functions'
-import filled from '@/shared/validators/filled.js'
-import { reportError } from '@/shared/functions'
 
 export default {
 	components: {
-		cForm,
-		cField,
-		// Language
 	},
 	data () {
 		return {
-			loginForm: {
-				name: 'login-form',
+			demoform: {
+				name: 'demo',
 				fields: {
-					username: '',
-					password: ''
+					checkbox: true,
+					selectbox: '1',
+					text: 'demotext',
+					password: 'demopassword'
 				}
 			},
-			remember: false,
-			showPassword: false,
+			demoselectlist: [
+				{label: 'demo option 1', value: '1'},
+				{label: 'demo option 2', value: '2'},
+				{label: 'demo option 3', value: '3'},
+			],
+			showPassword: {
+				demo: false
+			}
 		}
 	},
-	mounted: function () {
-		document.body.className = 'login-page';
-		this.loginForm.fields.username = sessionStorage.account;
-		this.loginForm.fields.password = sessionStorage.orgPass;
-	},
 	methods: {
-		togglePassword (e) {
-			this.showPassword = !this.showPassword
+		demosave() {
+
 		},
-		login () {
-			if (this.remember) {
-				sessionStorage.setItem('account', this.loginForm.fields.username);
-				sessionStorage.setItem('orgPass', this.loginForm.fields.password);
-			} else {
-				if (sessionStorage.getItem('account')) sessionStorage.removeItem('account');
-				if (sessionStorage.getItem('orgPass')) sessionStorage.removeItem('orgPass');
-			}
-			// digestMessage(this.loginForm.fields.password).then(pass => {
-			if(filled(this.loginForm.fields.username)){
-				return reportError(this.t('username').cap+" : "+this.t('err.validation.filled-1').cap)
-			}
-			if(filled(this.loginForm.fields.password)){
-				return reportError(this.t('password').cap+" : "+this.t('err.validation.filled-1').cap)
-			}
-			ws.conn(
-				this.loginForm.fields.username,
-				this.loginForm.fields.password,
-			)
-			// })
-			
+		togglePassword(field) {
+			this.showPassword[field] = !this.showPassword[field]
 		}
 	}
 }

@@ -32,66 +32,10 @@ function allowSuperuserOnly (to, from, next) {
 
 export const baseChildren = [
 	{
-		redirect: '/home/status',
+		redirect: '/home/demo',
 		path: '/home',
 		name: 'home',
 		component:getComponent('home/index.vue'),
-		children: [
-			{
-				path: '/home/status',
-				name: 'status',
-				component: getComponent('base/status/index.vue'),
-				title: () => t(store, 'status').cap,
-			},
-			{
-				path: '/home/wifi',
-				name: 'wifi',
-				component: getComponent('base/wireless/index.vue'),
-				title: () => t(store, 'wireless').str,
-			},
-			{
-				path: '/home/mesh',
-				name: 'mesh',
-				component: getComponent('base/mesh/index.vue'),
-				title: () => t(store, 'mesh').str,
-			},
-			{
-				path: '/home/network',
-				name: 'network',
-				component: getComponent('base/network/index.vue'),
-				title: () => t(store, 'network').str,
-			},
-			{
-				path: '/home/network-share',
-				name: 'network-share',
-				component: getComponent('base/share/index.vue'),
-				title: () => t(store, 'share').cap,
-			},
-			{
-				path: '/home/nat',
-				name: 'nat',
-				component: getComponent('base/nat/index.vue'),
-				title: () => t(store, 'nat').cap,
-			},
-			{
-				path: '/home/advanced',
-				name: 'advanced',
-				component: getComponent('base/advanced/index.vue'),
-				title: () => t(store, 'advanced').cap,
-			},
-			{
-				path: '/home/security',
-				name: 'security',
-				component: getComponent('base/security/index.vue'),
-				title: () => t(store, 'security').cap,
-			},
-			{
-				path: '/home/administration',
-				name: 'administration',
-				component: getComponent('base/administration/index.vue'),
-				title: () => t(store, 'administration').cap,
-			},
-		]
 	},
 /// #if buildOptions.__UNUSED
 	{

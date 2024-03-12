@@ -23,7 +23,6 @@
 						<ul class="nav-setting" style="text-transform : uppercase;">
 							<!-- <note></note> -->
 							<!-- <led v-if="$buildOptions.ledcontrol&this.$route.name!='login'"></led> -->
-							<widelang></widelang>
 							<!-- <language style='color: white;'></language> -->
 							<admin v-if="this.$route.name!='login'"></admin>
 							<!-- <li>Help</li> -->

@@ -57,97 +57,26 @@ class Instance {
 		this.onTimeout = options.onTimeout
 	}
 
+	catchError(err) {
+		if (err.code == 7) {
+				err.message = t(store, 'too-many-attempts').cap
+		}
+		else if (err.code == 5) {
+				err.message = t(store, 'invalid-credentials').cap
+		}
+		else if (err.code == 6) {
+				err.message = t(store, 'login-err').cap
+		}
+		else {
+				err.message = t(store, 'conn-error').cap
+		}
+		this.onAuthError()
+		this.disconnect()
+		reportError(err.message)
+	}
+
 	async conn (username = null, password = null, token = null) {
-		return new Promise((resolve, reject) => {
-			if (!this.ws) {
-				this.ws = new WebSocket(serverAddresses().ws, "jsonrpc")
-
-				const csrfToken = await fetchCsrfToken()
-
-				if (!csrfToken) {
-					reject(new Error('Failed to fetch CSRF token'))
-					return
-				}
-				else {
-					this.call({
-						method: "api",
-						params: {
-							path: "/auth/login",
-							action: "post",
-							msg: {
-								username: username,
-								password: password,
-								csrfToken: csrfToken
-							}
-						},
-					}).then(({ dict }) => {
-						store.dispatch('setUserID', { id: dict.username })
-						store.dispatch('setSid', { sid: dict.ubus_rpc_session })
-						store.dispatch('setCsrftoken', { csrftoken: dict.csrfToken })
-						sessionStorage.setItem('username', username)
-						sessionStorage.setItem('password', password)
-						this.onConnect()
-						resolve()
-					}).catch(err => {
-						if (err.code == 7) {
-							err.message = t(store, 'too-many-attempts').cap
-						}
-						else if (err.code == 5) {
-							err.message = t(store, 'invalid-credentials').cap
-						}
-						else if (err.code == 6) {
-							err.message = t(store, 'invalid-credentials').cap
-						}
-						else {
-							err.message = t(store, 'conn-error').cap
-						}
-						reportError(err)
-						this.onAuthError()
-						this.disconnect()
-						reject(err)
-					})
-				}
-			}
-
-			// once connection is up
-			// all calls in queue are
-			// invoked and queue cleared
-			this.ws.onopen = () => {
-				this.flushQueue()
-			}
-
-			this.ws.onclose = event => {
-				if (this.onDisconnect) {
-					this.onDisconnect(event)
-				}
-				this.ws = null
-			}
-
-			if (this.onError) {
-				this.ws.onerror = e => {
-					this.onError(e)
-				}
-			}
-
-			// requests map holds all
-			// calls' promise instances
-			// by calls' ID. Once a call
-			// receives data, we resolve
-			// corresponding promise instance
-			this.ws.onmessage = e => {
-				let data = JSON.parse(e.data)
-				if (data.error) {
-					if (this.requests[data.id]) this.requests[data.id].reject(data.error)
-					return
-				}
-
-				let dict = data.result
-				const output = parse(this.requests[data.id], {dict})
-				this.requests[data.id].resolve(output)
-			}
-
-			return this.ws
-		})
+		return this.onConnect()
 	}
 
 	// adds a call to
